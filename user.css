@@ -1,0 +1,497 @@
+/* ════════════════════════════════════════════════════════════
+   kpop-theme
+   A dark Spicetify theme with neon K-pop accents
+
+   Author:  Chrisss666
+   License: MIT (see LICENSE)
+   Repo:    https://github.com/Chrisss666/kpop-theme
+
+   Accents: Electric Lilac #C9A6FF · Holographic Pink #FF4FD8
+            Cyber Cyan #6BE7FF
+
+   Sections in this file:
+     1. Typography       6. Nav links / buttons / player icons
+     2. Background        7. Progress bar / track rows
+     3. Glass panels       8. Search input
+     4. Glass cards         9. Tooltips / popovers
+     5. Play buttons         10. Scrollbar
+   ════════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap');
+
+:root {
+  --k-lilac:    #C9A6FF;
+  --k-pink:     #FF4FD8;
+  --k-cyan:     #6BE7FF;
+  --k-midnight: #0B0713;
+
+  --k-glass-fill:   rgba(255, 255, 255, 0.03);
+  --k-glass-fill-2: rgba(255, 255, 255, 0.06);
+  --k-glass-border: 1px solid rgba(255, 255, 255, 0.08);
+  --k-glass-blur:   blur(24px) saturate(150%);
+
+  --k-r-sm: 12px;
+  --k-r:    16px;
+  --k-r-lg: 24px;
+
+  --k-shadow:     0 8px 40px rgba(0, 0, 0, 0.45);
+  --k-glow-lilac: 0 0 0 1px rgba(201, 166, 255, 0.35),
+                  0 0 18px rgba(201, 166, 255, 0.45),
+                  0 0 40px rgba(201, 166, 255, 0.22);
+  --k-glow-pink:  0 0 0 1px rgba(255, 79, 216, 0.35),
+                  0 0 18px rgba(255, 79, 216, 0.45),
+                  0 0 40px rgba(255, 79, 216, 0.22);
+  --k-glow-cyan:  0 0 18px rgba(107, 231, 255, 0.40),
+                  0 0 40px rgba(107, 231, 255, 0.18);
+
+  --k-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  /* GPU-compositing hint reused by every glass panel (fixes flicker) */
+}
+
+/* ────────────────────────────────────────────────────────────
+   1 · TYPOGRAPHY — global override
+   ──────────────────────────────────────────────────────────── */
+*,
+body,
+button,
+input,
+.Root__typestyle,
+.encore-text {
+  font-family: 'Space Grotesk', system-ui, sans-serif !important;
+  letter-spacing: 0.1px;
+}
+h1, h2, h3,
+.main-entityHeader-title,
+.main-entityHeader-titleText,
+.main-shelf-title,
+.encore-text-headline-large,
+.encore-text-headline-medium,
+.encore-text-title-large {
+  font-family: 'Syne', 'Space Grotesk', sans-serif !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.5px !important;
+}
+
+/* ────────────────────────────────────────────────────────────
+   2 · BACKGROUND — the ONE gradient lives only on top-container.
+        Everything else is fully transparent (kills flicker layers).
+   ──────────────────────────────────────────────────────────── */
+.Root__top-container {
+  background:
+    radial-gradient(1100px 700px at 8% -6%,  rgba(255, 79, 216, 0.16), transparent 55%),
+    radial-gradient(1200px 800px at 96% 4%,  rgba(107, 231, 255, 0.12), transparent 55%),
+    radial-gradient(1000px 900px at 50% 118%, rgba(201, 166, 255, 0.14), transparent 55%),
+    linear-gradient(160deg, #140A28 0%, var(--k-midnight) 55%, #0A0611 100%) !important;
+  /* NO background-attachment:fixed — it forced Chromium to re-raster the
+     whole background every frame the footer's backdrop-filter re-sampled,
+     which is exactly the flicker behind the glass footer while playing.
+     Pin it into its own stable GPU layer instead. */
+  background-attachment: scroll !important;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* No other element may paint a background */
+html,
+body,
+#main,
+.Root,
+.Root__main-view,
+.main-view-container,
+.main-view-container__scroll-node,
+.main-home-content,
+.main-gridContainer-gridContainer,
+.main-shelf-shelf,
+.main-entityHeader-container,
+.main-entityHeader-backgroundColor,
+.main-entityHeader-backgroundOverColorGradient,
+.main-topBar-background,
+.view-homeShortcutsGrid-grid {
+  background: transparent !important;
+}
+
+/* ────────────────────────────────────────────────────────────
+   3 · FLOATING GLASS PANELS
+        Sidebar · Right sidebar · Top bar · PLAYBAR (footer only)
+        GPU-forced compositing removes the backdrop-filter flicker.
+   ──────────────────────────────────────────────────────────── */
+.Root__nav-bar,
+.Root__right-sidebar,
+.Root__top-bar,
+.main-topBar-container {
+  background: var(--k-glass-fill) !important;
+  backdrop-filter: var(--k-glass-blur) !important;
+  -webkit-backdrop-filter: var(--k-glass-blur) !important;
+  border: var(--k-glass-border) !important;
+  box-shadow: var(--k-shadow) !important;
+  /* force GPU layer → no flicker behind glass */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Clip children to rounded corners — NOT the playbar (tooltip must escape) */
+.Root__nav-bar,
+.Root__right-sidebar,
+.Root__top-bar,
+.main-topBar-container {
+  overflow: hidden !important;
+}
+
+.Root__nav-bar        { border-radius: var(--k-r-lg) !important; margin: 8px 4px 8px 8px; }
+.Root__right-sidebar  { border-radius: var(--k-r-lg) !important; margin: 8px 8px 8px 4px; }
+
+/* ── PLAYBAR: NO backdrop-filter (that was the flicker source) ──
+   A backdrop-filter must re-sample the pixels behind it every frame; while a
+   song plays the progress bar repaints continuously and drags that resample
+   with it → the background flicker. We drop the glass entirely and use a
+   SOLID gradient panel instead: opaque, so there is nothing to re-sample and
+   physically nothing left to flicker. A pastel top-edge glow keeps it premium
+   and on-theme. */
+footer.main-nowPlayingBar-container,
+.main-nowPlayingBar-container {
+  background: linear-gradient(180deg,
+              rgba(30, 18, 52, 0.94) 0%,
+              rgba(14, 10, 24, 0.98) 100%) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  border-top: 1px solid rgba(201, 166, 255, 0.28) !important;
+  border-radius: var(--k-r-lg) !important;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5),
+              0 -1px 24px rgba(201, 166, 255, 0.10),
+              inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+  margin: 0 10px 10px 10px;
+  overflow: visible !important;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+/* ── Playbar internals: ZERO own glass. Single sleek panel. ──
+   The inner .main-nowPlayingBar-nowPlayingBar and every wrapper are flat. */
+.main-nowPlayingBar-nowPlayingBar,
+.main-nowPlayingBar-nowPlayingBar > *,
+.main-nowPlayingBar-left,
+.main-nowPlayingBar-center,
+.main-nowPlayingBar-right,
+.main-nowPlayingBar-extraControls,
+.main-nowPlayingBar-volumeBar,
+.main-nowPlayingWidget-nowPlaying,
+.main-nowPlayingWidget-nowPlaying > *,
+.main-nowPlayingWidget-trackInfo,
+.main-nowPlayingWidget-coverArtContainer,
+.main-trackInfo-container,
+.player-controls,
+.player-controls__buttons,
+.player-controls__left,
+.player-controls__right,
+.main-coverSlotCollapsed-container,
+.main-coverSlotExpanded-container {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Library / nav inner containers transparent */
+.main-yourLibraryX-libraryContainer,
+.main-yourLibraryX-libraryRootlist,
+.main-navBar-navBar,
+.main-yourLibraryX-header {
+  background: transparent !important;
+}
+
+/* ────────────────────────────────────────────────────────────
+   4 · GLASS CARDS
+   ──────────────────────────────────────────────────────────── */
+.main-card-card {
+  background: var(--k-glass-fill) !important;
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  border: var(--k-glass-border);
+  border-radius: var(--k-r) !important;
+  box-shadow: var(--k-shadow);
+  overflow: hidden !important;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  transition: transform 0.3s var(--k-ease),
+              background 0.3s var(--k-ease),
+              border-color 0.3s var(--k-ease),
+              box-shadow 0.3s var(--k-ease);
+}
+.main-card-card:hover {
+  transform: scale(1.02) translateZ(0);
+  background: var(--k-glass-fill-2) !important;
+  border-color: rgba(201, 166, 255, 0.35);
+  box-shadow: var(--k-glow-lilac), var(--k-shadow);
+}
+
+/* Card text always fully visible & readable */
+.main-card-cardTitle,
+.main-card-cardTitle a,
+.main-card-cardTitleLink {
+  color: var(--text, #F4F0FF) !important;
+  opacity: 1 !important;
+}
+.main-card-cardMetadata,
+.main-card-cardMetadata a,
+.main-card-cardMetadataWrapper {
+  color: var(--subtext, #B9AEE6) !important;
+  opacity: 1 !important;
+}
+
+/* Rounded cover art */
+.main-card-imageContainer,
+.main-cardImage-imageWrapper,
+.main-image-image,
+.main-entityHeader-imageContainer,
+.main-trackList-rowImage,
+.main-nowPlayingWidget-coverArt,
+.view-homeShortcutsGrid-imageWrapper,
+.cover-art {
+  border-radius: var(--k-r-sm) !important;
+  overflow: hidden;
+}
+
+/* ════════════════════════════════════════════════════════════
+   5 · PLAY BUTTONS  — pink, 12px, dark icon, hidden until hover
+        Kills Spotify green entirely. No permanent pink boxes.
+   ════════════════════════════════════════════════════════════ */
+
+/* 5a · Wrappers never draw their own shape/fill */
+.main-card-PlayButtonContainer,
+.main-card-PlayButtonContainerVisible,
+.view-homeShortcutsGrid-PlayButtonContainer,
+.main-actionBar-ActionBarPlayButtonContainer {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* 5b · The button itself — solid accent, no green, 12px */
+.main-playButton-PlayButton,
+.main-playButton-button,
+button[data-encore-id="playButton"],
+.view-homeShortcutsGrid-playButton,
+.main-card-card button[data-encore-id="playButton"],
+.main-trackList-trackListRow button[data-encore-id="playButton"] {
+  background: var(--spice-button-active, #ff66b2) !important;
+  background-color: var(--spice-button-active, #ff66b2) !important;
+  background-image: none !important;
+  color: black !important;
+  /* neutralise encore green tokens */
+  --background-base: var(--spice-button-active, #ff66b2) !important;
+  --background-highlight: var(--spice-button-active, #ff66b2) !important;
+  --background-press: var(--spice-button-active, #ff66b2) !important;
+  --text-base: #000000 !important;
+  border: none !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 14px rgba(255, 79, 216, 0.35) !important;
+  transition: opacity 0.3s var(--k-ease),
+              transform 0.3s var(--k-ease),
+              box-shadow 0.3s var(--k-ease) !important;
+}
+.main-playButton-PlayButton svg,
+.main-playButton-button svg,
+button[data-encore-id="playButton"] svg,
+.view-homeShortcutsGrid-playButton svg {
+  fill: black !important;
+  color: black !important;
+}
+
+/* 5c · Hidden by default, revealed on card / shortcut hover or when active */
+.main-card-PlayButtonContainer,
+.view-homeShortcutsGrid-PlayButtonContainer,
+.main-card-card .main-playButton-PlayButton,
+.main-card-card button[data-encore-id="playButton"],
+.view-homeShortcutsGrid-playButton {
+  opacity: 0;
+  transition: opacity 0.3s var(--k-ease);
+}
+.main-card-card:hover .main-card-PlayButtonContainer,
+.main-card-card:hover .main-playButton-PlayButton,
+.main-card-card:hover button[data-encore-id="playButton"],
+.main-card-PlayButtonContainerVisible,
+.view-homeShortcutsGrid-shortcut:hover .view-homeShortcutsGrid-PlayButtonContainer,
+.view-homeShortcutsGrid-shortcut:hover .view-homeShortcutsGrid-playButton,
+.view-homeShortcutsGrid-shortcut[aria-current="true"] .view-homeShortcutsGrid-playButton {
+  opacity: 1 !important;
+}
+
+/* 5d · Hover polish (only lift + glow, never hides content) */
+.main-card-card:hover .main-playButton-PlayButton,
+.main-card-card:hover button[data-encore-id="playButton"],
+.view-homeShortcutsGrid-shortcut:hover .view-homeShortcutsGrid-playButton {
+  transform: scale(1.06);
+  box-shadow: var(--k-glow-pink) !important;
+}
+
+/* ────────────────────────────────────────────────────────────
+   6 · NAV LINKS & LIBRARY ROWS — soft hover + glow
+   ──────────────────────────────────────────────────────────── */
+.main-yourLibraryX-navLink,
+.main-yourLibraryX-listItem,
+.main-navBar-navBarLink {
+  border-radius: var(--k-r-sm);
+  transition: all 0.3s var(--k-ease);
+}
+.main-yourLibraryX-navLink:hover,
+.main-yourLibraryX-listItem:hover,
+.main-navBar-navBarLink:hover {
+  background: var(--k-glass-fill-2) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  transform: translateX(2px);
+}
+.main-yourLibraryX-navLinkActive,
+.main-navBar-navBarLinkActive {
+  background: linear-gradient(90deg,
+              rgba(201, 166, 255, 0.16),
+              rgba(255, 79, 216, 0.08)) !important;
+  box-shadow: inset 0 0 0 1px rgba(201, 166, 255, 0.35);
+}
+
+/* Standard pill buttons */
+.main-buttons-button,
+.main-noConnection-button {
+  border-radius: 999px !important;
+  transition: all 0.3s var(--k-ease);
+}
+.main-buttons-button:hover {
+  box-shadow: var(--k-glow-cyan);
+  transform: translateY(-1px);
+}
+
+/* Player control icons */
+.player-controls__buttons button,
+.main-shuffleButton-button,
+.main-repeatButton-button {
+  transition: all 0.3s var(--k-ease);
+}
+.player-controls__buttons button:hover {
+  transform: scale(1.14);
+  filter: drop-shadow(0 0 8px rgba(255, 79, 216, 0.7));
+}
+.main-shuffleButton-button.main-shuffleButton-active,
+.main-repeatButton-button.main-repeatButton-active {
+  color: var(--k-pink) !important;
+  filter: drop-shadow(0 0 8px rgba(255, 79, 216, 0.75));
+}
+
+/* ────────────────────────────────────────────────────────────
+   7 · PROGRESS BAR — clean track + accent fill (no fraying)
+   ──────────────────────────────────────────────────────────── */
+.playback-progressbar,
+.playback-progressbar-isInteractive,
+.main-nowPlayingBar-center {
+  overflow: visible !important;
+}
+
+/* Decouple the constantly-updating progress bar & time readouts into their
+   OWN compositing layers so their per-frame repaints stay off the glass
+   layer behind the footer → kills the background flicker while playing. */
+.playback-bar,
+.playback-progressbar,
+.playback-progressbar-isInteractive,
+.main-playbackBarRemainingTime-container,
+.playback-bar__progress-time-elapsed {
+  transform: translateZ(0) !important;
+  -webkit-transform: translateZ(0) !important;
+  will-change: transform !important;
+  backface-visibility: hidden !important;
+}
+
+.progress-bar-background,
+.x-progressBar-background,
+.playback-progressbar .progress-bar-background {
+  background: rgba(255, 255, 255, 0.14) !important;
+  border-radius: 999px !important;
+}
+
+.progress-bar-color,
+.x-progressBar-fillColor,
+.playback-progressbar .progress-bar-color {
+  background: var(--k-pink) !important;      /* solid, clean — no frayed gradient */
+  border-radius: 999px !important;
+  box-shadow: 0 0 6px rgba(255, 79, 216, 0.45) !important;
+}
+
+.progress-bar-handle,
+.x-progressBar-sliderArea .progress-bar-handle {
+  background: #FFFFFF !important;
+  border-radius: 50% !important;
+  box-shadow: var(--k-glow-pink) !important;
+}
+
+/* Track-list rows */
+.main-trackList-trackListRow {
+  border-radius: var(--k-r-sm);
+  transition: all 0.3s var(--k-ease);
+}
+.main-trackList-trackListRow:hover {
+  background: var(--k-glass-fill-2) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+/* Playlist row: the SONG COVER IMAGE lights up with a neon glow on row hover. */
+.main-trackList-rowImage {
+  transition: box-shadow 0.3s var(--k-ease), transform 0.2s var(--k-ease);
+}
+.main-trackList-trackListRow:hover .main-trackList-rowImage {
+  box-shadow: var(--k-glow-pink) !important;
+  transform: scale(1.03);
+}
+
+/* ────────────────────────────────────────────────────────────
+   8 · SEARCH INPUT
+   ──────────────────────────────────────────────────────────── */
+.x-searchInput-searchInputInput,
+input[type="text"] {
+  background: var(--k-glass-fill) !important;
+  border: var(--k-glass-border) !important;
+  border-radius: 999px !important;
+  color: var(--k-lilac) !important;
+  transition: all 0.3s var(--k-ease);
+}
+.x-searchInput-searchInputInput:focus {
+  box-shadow: var(--k-glow-lilac) !important;
+  border-color: rgba(201, 166, 255, 0.4) !important;
+}
+
+/* ────────────────────────────────────────────────────────────
+   9 · TOOLTIPS / SCRUBBING PREVIEW — float as isolated glass
+   ──────────────────────────────────────────────────────────── */
+.main-tooltip,
+[class*="-legacy-tooltip"],
+[class*="-legacy-popover"],
+.encore-tooltip,
+.encore-popover {
+  background: rgba(20, 14, 34, 0.72) !important;
+  backdrop-filter: blur(20px) saturate(150%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(150%) !important;
+  border: var(--k-glass-border) !important;
+  border-radius: var(--k-r) !important;
+  box-shadow: var(--k-shadow) !important;
+  overflow: hidden !important;
+  z-index: 9999 !important;
+}
+
+/* ────────────────────────────────────────────────────────────
+   10 · SCROLLBAR
+   ──────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--k-lilac), var(--k-pink));
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--k-pink), var(--k-cyan));
+  background-clip: padding-box;
+}
