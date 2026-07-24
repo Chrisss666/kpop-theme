@@ -235,13 +235,13 @@ footer.main-nowPlayingBar-container,
 .main-card-cardTitle,
 .main-card-cardTitle a,
 .main-card-cardTitleLink {
-  color: var(--text, #F4F0FF) !important;
+  color: var(--spice-text, #F4F0FF) !important;
   opacity: 1 !important;
 }
 .main-card-cardMetadata,
 .main-card-cardMetadata a,
 .main-card-cardMetadataWrapper {
-  color: var(--subtext, #B9AEE6) !important;
+  color: var(--spice-subtext, #B9AEE6) !important;
   opacity: 1 !important;
 }
 
