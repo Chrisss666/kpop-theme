@@ -18,7 +18,6 @@ accents
   pink accent; play buttons stay hidden until you hover a card or track row.
 - **Custom typography** — [Space Grotesk](https://fonts.google.com/specimen/Space+Grotesk)
   for body text, [Syne](https://fonts.google.com/specimen/Syne) for headings.
-- **Light and dark color schemes**, defined in `color.ini`.
 
 ## Installation
 
@@ -37,14 +36,13 @@ accents
 
    ```sh
    spicetify config current_theme kpop-theme
-   spicetify config color_scheme Base   # or "light"
    spicetify apply
    ```
 
 ## Customization
 
 - Colors are defined once in [`color.ini`](color.ini) and consumed as
-  `--spice-*` variables — tweak the `[Base]` (dark) or `[light]` sections to
+  `--spice-*` variables — tweak the `[Base]` section to
   change the palette without touching the CSS.
 - Theme-specific tuning (glass opacity, blur radius, glow strength, corner
   radius, fonts) lives in the `:root` custom properties and section 1 of
