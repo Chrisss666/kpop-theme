@@ -1,8 +1,7 @@
 # kpop-theme
 
-A dark, glassmorphic [Spicetify](https://spicetify.app/) theme with neon K-pop
-accents — frosted-glass panels, glowing hover states, a flicker-free solid
-playbar, and hand-picked display/body webfonts.
+A dark [Spicetify](https://spicetify.app/) theme with neon K-pop
+accents
 
 ## Features
 
