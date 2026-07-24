@@ -1,7 +1,7 @@
 # kpop-theme
 
 A dark [Spicetify](https://spicetify.app/) theme with neon K-pop
-accents
+themed accents
 
 ## Features
 
