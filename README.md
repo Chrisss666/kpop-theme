@@ -3,6 +3,9 @@
 A dark [Spicetify](https://spicetify.app/) theme with neon K-pop
 themed accents
 
+> **[Write-up →](https://404brainnotfound.at/en/projects/kpop-theme/)**
+> · [Portfolio](https://404brainnotfound.at) · [Auf Deutsch](https://404brainnotfound.at/projekte/kpop-theme/)
+
 ## Features
 
 - **Holographic glass UI** — sidebar, right sidebar, top bar, cards and
@@ -48,6 +51,19 @@ themed accents
   radius, fonts) lives in the `:root` custom properties and section 1 of
   [`user.css`](user.css).
 
+## See also
+
+[**Zen Mode**](https://github.com/Chrisss666/Zen-Mode) — a fullscreen
+now-playing overlay built to match this palette. The two are designed to be
+used together.
+
 ## License
 
 [MIT](LICENSE) © Chrisss666
+
+---
+
+Part of my portfolio at **[404brainnotfound.at](https://404brainnotfound.at)**.
+Other projects: [Zen Mode](https://github.com/Chrisss666/Zen-Mode) ·
+[avatarGenerator](https://github.com/Chrisss666/avatarGenerator) ·
+[all of them](https://404brainnotfound.at/en/projects/)
