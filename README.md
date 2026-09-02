@@ -1,10 +1,30 @@
-# kpop-theme
+<p align="center">
+  <img src="https://shieldcn.dev/header/gradient.svg?title=K-Pop+Theme&subtitle=A+neon+glass+Spicetify+theme+inspired+by+K-pop&mode=dark&font=geist">
+</p>
 
-A dark [Spicetify](https://spicetify.app/) theme with neon K-pop
-themed accents
+<br>
 
-> **[Write-up →](https://404brainnotfound.at/en/projects/kpop-theme/)**
-> · [Portfolio](https://404brainnotfound.at) · [Auf Deutsch](https://404brainnotfound.at/projekte/kpop-theme/)
+<p align="center">
+  <b>A dark, holographic K-pop inspired theme for Spicetify.</b>
+</p>
+
+<p align="center">
+  Holographic Glass · Neon Accents · Custom Typography · Themeable Colors
+</p>
+
+<p align="center">
+  <a href="https://404brainnotfound.at/en/projects/kpop-theme/">Write-up</a>
+  ·
+  <a href="https://404brainnotfound.at">Portfolio</a>
+</p>
+
+<br>
+
+<p align="center">
+  <img src="preview.png" alt="K-Pop Theme Preview" width="900">
+</p>
+
+<br>
 
 ## Features
 
