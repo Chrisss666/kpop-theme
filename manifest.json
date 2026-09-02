@@ -1,0 +1,24 @@
+{
+    "name": "K-Pop Theme",
+    "description": "A dark K-pop-inspired Spicetify theme with holographic glass UI, neon accents and custom typography.",
+
+    "preview": "preview.png",
+    "readme": "README.md",
+
+    "usercss": "user.css",
+    "schemes": "color.ini",
+
+    "authors": [
+        {
+            "name": "Chrisss666",
+            "url": "https://github.com/Chrisss666"
+        }
+    ],
+
+    "tags": [
+        "dark",
+        "kpop",
+        "neon",
+        "glass"
+    ]
+}
