@@ -108,7 +108,19 @@ body,
 .main-entityHeader-backgroundColor,
 .main-entityHeader-backgroundOverColorGradient,
 .main-topBar-background,
-.view-homeShortcutsGrid-grid {
+.view-homeShortcutsGrid-grid,
+.main-actionButtons-spacer.main-actionButtons,
+.dqwQhIudKoD98eWJzj5E {
+  background: transparent !important;
+}
+
+/* Spotify paints a decorative color-extracted backdrop behind Home/entity
+   headers as an empty <div style="background-color:..."> with a build-hashed
+   class (dqwQhIudKoD98eWJzj5E above, today) — it changes on every update, so
+   also catch it structurally: any empty element whose ONLY styling is an
+   inline background-color is this kind of decorative swatch, never real
+   content, so it's safe to flatten generically. */
+.main-view-container div:empty[style*="background-color"] {
   background: transparent !important;
 }
 
@@ -349,6 +361,16 @@ button[data-encore-id="playButton"],
               transform 0.3s var(--k-ease),
               box-shadow 0.3s var(--k-ease) !important;
 }
+/* Spotify puts its own drop-shadow (box-shadow: 0 8px 8px rgba(0,0,0,.3)) on
+   the play button's immediate wrapper — a build-hashed <div> we can't name
+   directly. It used to be invisible, masked by a stronger glow underneath;
+   now that the button shows correctly it reads as a hard square outline.
+   Select the wrapper structurally (any div whose direct child is the known,
+   stable .main-playButton-PlayButton) instead of by its unstable class name,
+   and drop its shadow. */
+div:has(> .main-playButton-PlayButton) {
+  box-shadow: none !important;
+}
 .main-playButton-PlayButton svg,
 .main-playButton-PlayButton .e-10860-icon,
 .main-playButton-button svg,
@@ -392,11 +414,15 @@ div:has(> [data-testid="shortcut-background"]):hover .main-playButton-PlayButton
   opacity: 1 !important;
 }
 
-/* 5d · Hover polish (only lift + glow, never hides content) */
+/* 5d · Hover polish (only lift + glow, never hides content).
+   NOT applied to the shortcuts-row case: .main-playButton-PlayButton there
+   is a plain square <div> with no border-radius, and --k-glow-pink includes
+   a hard "0 0 0 1px" ring — on a square box that reads as a sharp square
+   outline around the (rounded) button. The button already gets its own
+   rounded glow from 5b, so no extra shadow is needed here. */
 .main-card-card:hover .main-playButton-PlayButton,
 .main-card-card:hover button[data-encore-id="playButton"],
-.view-homeShortcutsGrid-shortcut:hover .view-homeShortcutsGrid-playButton,
-div:has(> [data-testid="shortcut-background"]):hover .main-playButton-PlayButton {
+.view-homeShortcutsGrid-shortcut:hover .view-homeShortcutsGrid-playButton {
   transform: scale(1.06);
   box-shadow: var(--k-glow-pink) !important;
 }
