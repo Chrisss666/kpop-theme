@@ -198,6 +198,32 @@ footer.main-nowPlayingBar-container,
   -webkit-backdrop-filter: none !important;
 }
 
+/* Custom-app / extension buttons in the playbar (e.g. zen-mode.js's
+   ".main-genericButton-button") ship with ZERO Encore classes — there is no
+   native styling to "restore", they need real styling to match the icon
+   buttons next to them (queue, connect, mute, pip, fullscreen), which get
+   their look from Encore's tertiary-button classes. */
+.main-genericButton-button {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 999px;
+  padding: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--spice-subtext, #B9AEE6) !important;
+  cursor: pointer;
+  transition: color 0.2s var(--k-ease), transform 0.2s var(--k-ease);
+}
+.main-genericButton-button:hover {
+  color: var(--spice-text, #F4F0FF) !important;
+  transform: scale(1.1);
+}
+.main-genericButton-button svg {
+  fill: currentColor !important;
+}
+
 /* Library / nav inner containers transparent */
 .main-yourLibraryX-libraryContainer,
 .main-yourLibraryX-libraryRootlist,
@@ -263,19 +289,50 @@ footer.main-nowPlayingBar-container,
         Kills Spotify green entirely. No permanent pink boxes.
    ════════════════════════════════════════════════════════════ */
 
-/* 5a · Wrappers never draw their own shape/fill */
+/* 5a · Wrappers never draw their own shape/fill.
+   .main-playButton-PlayButton is a plain layout <div> — the real button is
+   nested inside it (see 5b) and Spotify handles its own show/hide-on-hover.
+   The wrapper must stay fully transparent or it paints a permanent box on
+   top of whatever Spotify is doing with the real button underneath. */
 .main-card-PlayButtonContainer,
 .main-card-PlayButtonContainerVisible,
 .view-homeShortcutsGrid-PlayButtonContainer,
-.main-actionBar-ActionBarPlayButtonContainer {
+.main-actionBar-ActionBarPlayButtonContainer,
+.main-playButton-PlayButton {
   background: transparent !important;
   background-color: transparent !important;
   box-shadow: none !important;
   border: none !important;
 }
 
-/* 5b · The button itself — solid accent, no green, 12px */
-.main-playButton-PlayButton,
+/* 5b · The button itself — solid accent, no green, 12px.
+   Ground truth from the live client (verified via DevTools):
+     <div class="main-playButton-PlayButton">
+       <button data-encore-id="buttonPrimary" class="e-10860-legacy-button-primary e-10860-legacy-button">
+         <span class="e-10860-button-primary__inner encore-bright-accent-set ...">
+           <svg class="e-10860-icon">...</svg>
+         </span>
+       </button>
+     </div>
+   .encore-bright-accent-set HARDCODES --background-base/-highlight/-press and
+   --text-base directly on the same <span> that consumes them
+   (.e-10860-button-primary__inner reads background-color:var(--background-base)).
+   A variable redeclared on the element that uses it always wins over a
+   redeclaration on an ancestor, !important or not — that's why overriding
+   these tokens on the outer wrapper (the old approach) never had any visible
+   effect. They must be overridden on .encore-bright-accent-set itself. This
+   class is Spotify's general "paint bright/green" utility, used for primary
+   CTAs beyond just play buttons, so overriding it globally is intentional —
+   it's the only way to actually kill Spotify green anywhere it appears. */
+.encore-bright-accent-set {
+  --background-base: var(--spice-button-active, #ff66b2) !important;
+  --background-highlight: var(--spice-button-active, #ff66b2) !important;
+  --background-press: #e8399f !important;
+  --essential-bright-accent: var(--spice-button-active, #ff66b2) !important;
+  --text-base: #000000 !important;
+}
+.main-playButton-PlayButton button[data-encore-id="buttonPrimary"],
+.main-playButton-PlayButton .e-10860-button-primary__inner,
 .main-playButton-button,
 button[data-encore-id="playButton"],
 .view-homeShortcutsGrid-playButton,
@@ -285,11 +342,6 @@ button[data-encore-id="playButton"],
   background-color: var(--spice-button-active, #ff66b2) !important;
   background-image: none !important;
   color: black !important;
-  /* neutralise encore green tokens */
-  --background-base: var(--spice-button-active, #ff66b2) !important;
-  --background-highlight: var(--spice-button-active, #ff66b2) !important;
-  --background-press: var(--spice-button-active, #ff66b2) !important;
-  --text-base: #000000 !important;
   border: none !important;
   border-radius: 12px !important;
   box-shadow: 0 4px 14px rgba(255, 79, 216, 0.35) !important;
@@ -298,6 +350,7 @@ button[data-encore-id="playButton"],
               box-shadow 0.3s var(--k-ease) !important;
 }
 .main-playButton-PlayButton svg,
+.main-playButton-PlayButton .e-10860-icon,
 .main-playButton-button svg,
 button[data-encore-id="playButton"] svg,
 .view-homeShortcutsGrid-playButton svg {
