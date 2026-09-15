@@ -377,10 +377,26 @@ button[data-encore-id="playButton"] svg,
   opacity: 1 !important;
 }
 
+/* Home page "shortcuts" rows (Liked Songs / playlist pills at the top of
+   Home): Spotify wraps each row in a build-hashed class we can't hardcode
+   (it changes across updates), but every row has one stable, fixed marker:
+   a direct child with data-testid="shortcut-background". :has() lets us
+   select the row by that marker instead of its unstable class name, so the
+   play button only appears on hover regardless of what Spotify renames the
+   wrapper to next. */
+div:has(> [data-testid="shortcut-background"]) .main-playButton-PlayButton {
+  opacity: 0;
+  transition: opacity 0.2s var(--k-ease);
+}
+div:has(> [data-testid="shortcut-background"]):hover .main-playButton-PlayButton {
+  opacity: 1 !important;
+}
+
 /* 5d · Hover polish (only lift + glow, never hides content) */
 .main-card-card:hover .main-playButton-PlayButton,
 .main-card-card:hover button[data-encore-id="playButton"],
-.view-homeShortcutsGrid-shortcut:hover .view-homeShortcutsGrid-playButton {
+.view-homeShortcutsGrid-shortcut:hover .view-homeShortcutsGrid-playButton,
+div:has(> [data-testid="shortcut-background"]):hover .main-playButton-PlayButton {
   transform: scale(1.06);
   box-shadow: var(--k-glow-pink) !important;
 }
