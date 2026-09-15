@@ -108,7 +108,19 @@ body,
 .main-entityHeader-backgroundColor,
 .main-entityHeader-backgroundOverColorGradient,
 .main-topBar-background,
-.view-homeShortcutsGrid-grid {
+.view-homeShortcutsGrid-grid,
+.main-actionButtons-spacer.main-actionButtons,
+.dqwQhIudKoD98eWJzj5E {
+  background: transparent !important;
+}
+
+/* Spotify paints a decorative color-extracted backdrop behind Home/entity
+   headers as an empty <div style="background-color:..."> with a build-hashed
+   class (dqwQhIudKoD98eWJzj5E above, today) — it changes on every update, so
+   also catch it structurally: any empty element whose ONLY styling is an
+   inline background-color is this kind of decorative swatch, never real
+   content, so it's safe to flatten generically. */
+.main-view-container div:empty[style*="background-color"] {
   background: transparent !important;
 }
 
@@ -198,6 +210,32 @@ footer.main-nowPlayingBar-container,
   -webkit-backdrop-filter: none !important;
 }
 
+/* Custom-app / extension buttons in the playbar (e.g. zen-mode.js's
+   ".main-genericButton-button") ship with ZERO Encore classes — there is no
+   native styling to "restore", they need real styling to match the icon
+   buttons next to them (queue, connect, mute, pip, fullscreen), which get
+   their look from Encore's tertiary-button classes. */
+.main-genericButton-button {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 999px;
+  padding: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--spice-subtext, #B9AEE6) !important;
+  cursor: pointer;
+  transition: color 0.2s var(--k-ease), transform 0.2s var(--k-ease);
+}
+.main-genericButton-button:hover {
+  color: var(--spice-text, #F4F0FF) !important;
+  transform: scale(1.1);
+}
+.main-genericButton-button svg {
+  fill: currentColor !important;
+}
+
 /* Library / nav inner containers transparent */
 .main-yourLibraryX-libraryContainer,
 .main-yourLibraryX-libraryRootlist,
@@ -263,19 +301,50 @@ footer.main-nowPlayingBar-container,
         Kills Spotify green entirely. No permanent pink boxes.
    ════════════════════════════════════════════════════════════ */
 
-/* 5a · Wrappers never draw their own shape/fill */
+/* 5a · Wrappers never draw their own shape/fill.
+   .main-playButton-PlayButton is a plain layout <div> — the real button is
+   nested inside it (see 5b) and Spotify handles its own show/hide-on-hover.
+   The wrapper must stay fully transparent or it paints a permanent box on
+   top of whatever Spotify is doing with the real button underneath. */
 .main-card-PlayButtonContainer,
 .main-card-PlayButtonContainerVisible,
 .view-homeShortcutsGrid-PlayButtonContainer,
-.main-actionBar-ActionBarPlayButtonContainer {
+.main-actionBar-ActionBarPlayButtonContainer,
+.main-playButton-PlayButton {
   background: transparent !important;
   background-color: transparent !important;
   box-shadow: none !important;
   border: none !important;
 }
 
-/* 5b · The button itself — solid accent, no green, 12px */
-.main-playButton-PlayButton,
+/* 5b · The button itself — solid accent, no green, 12px.
+   Ground truth from the live client (verified via DevTools):
+     <div class="main-playButton-PlayButton">
+       <button data-encore-id="buttonPrimary" class="e-10860-legacy-button-primary e-10860-legacy-button">
+         <span class="e-10860-button-primary__inner encore-bright-accent-set ...">
+           <svg class="e-10860-icon">...</svg>
+         </span>
+       </button>
+     </div>
+   .encore-bright-accent-set HARDCODES --background-base/-highlight/-press and
+   --text-base directly on the same <span> that consumes them
+   (.e-10860-button-primary__inner reads background-color:var(--background-base)).
+   A variable redeclared on the element that uses it always wins over a
+   redeclaration on an ancestor, !important or not — that's why overriding
+   these tokens on the outer wrapper (the old approach) never had any visible
+   effect. They must be overridden on .encore-bright-accent-set itself. This
+   class is Spotify's general "paint bright/green" utility, used for primary
+   CTAs beyond just play buttons, so overriding it globally is intentional —
+   it's the only way to actually kill Spotify green anywhere it appears. */
+.encore-bright-accent-set {
+  --background-base: var(--spice-button-active, #ff66b2) !important;
+  --background-highlight: var(--spice-button-active, #ff66b2) !important;
+  --background-press: #e8399f !important;
+  --essential-bright-accent: var(--spice-button-active, #ff66b2) !important;
+  --text-base: #000000 !important;
+}
+.main-playButton-PlayButton button[data-encore-id="buttonPrimary"],
+.main-playButton-PlayButton .e-10860-button-primary__inner,
 .main-playButton-button,
 button[data-encore-id="playButton"],
 .view-homeShortcutsGrid-playButton,
@@ -285,11 +354,6 @@ button[data-encore-id="playButton"],
   background-color: var(--spice-button-active, #ff66b2) !important;
   background-image: none !important;
   color: black !important;
-  /* neutralise encore green tokens */
-  --background-base: var(--spice-button-active, #ff66b2) !important;
-  --background-highlight: var(--spice-button-active, #ff66b2) !important;
-  --background-press: var(--spice-button-active, #ff66b2) !important;
-  --text-base: #000000 !important;
   border: none !important;
   border-radius: 12px !important;
   box-shadow: 0 4px 14px rgba(255, 79, 216, 0.35) !important;
@@ -297,7 +361,18 @@ button[data-encore-id="playButton"],
               transform 0.3s var(--k-ease),
               box-shadow 0.3s var(--k-ease) !important;
 }
+/* Spotify puts its own drop-shadow (box-shadow: 0 8px 8px rgba(0,0,0,.3)) on
+   the play button's immediate wrapper — a build-hashed <div> we can't name
+   directly. It used to be invisible, masked by a stronger glow underneath;
+   now that the button shows correctly it reads as a hard square outline.
+   Select the wrapper structurally (any div whose direct child is the known,
+   stable .main-playButton-PlayButton) instead of by its unstable class name,
+   and drop its shadow. */
+div:has(> .main-playButton-PlayButton) {
+  box-shadow: none !important;
+}
 .main-playButton-PlayButton svg,
+.main-playButton-PlayButton .e-10860-icon,
 .main-playButton-button svg,
 button[data-encore-id="playButton"] svg,
 .view-homeShortcutsGrid-playButton svg {
@@ -324,7 +399,27 @@ button[data-encore-id="playButton"] svg,
   opacity: 1 !important;
 }
 
-/* 5d · Hover polish (only lift + glow, never hides content) */
+/* Home page "shortcuts" rows (Liked Songs / playlist pills at the top of
+   Home): Spotify wraps each row in a build-hashed class we can't hardcode
+   (it changes across updates), but every row has one stable, fixed marker:
+   a direct child with data-testid="shortcut-background". :has() lets us
+   select the row by that marker instead of its unstable class name, so the
+   play button only appears on hover regardless of what Spotify renames the
+   wrapper to next. */
+div:has(> [data-testid="shortcut-background"]) .main-playButton-PlayButton {
+  opacity: 0;
+  transition: opacity 0.2s var(--k-ease);
+}
+div:has(> [data-testid="shortcut-background"]):hover .main-playButton-PlayButton {
+  opacity: 1 !important;
+}
+
+/* 5d · Hover polish (only lift + glow, never hides content).
+   NOT applied to the shortcuts-row case: .main-playButton-PlayButton there
+   is a plain square <div> with no border-radius, and --k-glow-pink includes
+   a hard "0 0 0 1px" ring — on a square box that reads as a sharp square
+   outline around the (rounded) button. The button already gets its own
+   rounded glow from 5b, so no extra shadow is needed here. */
 .main-card-card:hover .main-playButton-PlayButton,
 .main-card-card:hover button[data-encore-id="playButton"],
 .view-homeShortcutsGrid-shortcut:hover .view-homeShortcutsGrid-playButton {
